@@ -9,6 +9,8 @@ input=["enter the page name"]
 chrome_options.add_argument('window-size=1920x1080')
 browser = webdriver.Chrome(executable_path=r"C:\Users\puneet\Downloads\chromedriver.exe",options=chrome_options)
 browser.get("https://twitter.com/"+input)
+
+#setting selenium wbedriver for the given site
 print( browser.title)
 lastHeight = browser.execute_script("return document.body.scrollHeight")
 print (lastHeight)
@@ -21,7 +23,7 @@ while True:
 		break
 	lastHeight = newHeight
 	i += 1
-
+#getting to the last tweet
 html=browser.page_source
 soup=BeautifulSoup(html,'lxml')
 tag=soup.find_all("ol",id="stream-items-id")
@@ -30,19 +32,20 @@ tags
 lis=[]
 names=[]
 for i in tags:
-    a=i.find_all("div",class_="stream-item-header")
-    for j in a:
+    names_div=i.find_all("div",class_="stream-item-header")
+    for j in names_div:
         link=j.find_all("strong",class_="fullname show-popup-with-id u-textTruncate ")
         try:
             link=link[0]
-            p=(link.text)
-            names.append(p)
+            text=(link.text)
+            names.append(text)
         except:
             continue
+#getting the names of the people who tweeted	
 date=[]
 for i in tags:
-    a=i.find_all("div",class_="stream-item-header")
-    for j in a:
+    dates=i.find_all("div",class_="stream-item-header")
+    for j in dates:
         link=j.find_all("small",class_="time")
         try:
             link=link[0]
@@ -50,30 +53,35 @@ for i in tags:
             date.append(link.strip())
         except:
             continue
+#getting the dates of the tweets	
 paragraphs=[]
 for i in tags:
-    a=i.find_all("div",class_="content")
-    for j in a:
+    para=i.find_all("div",class_="content")
+    for j in para:
         link=j.find_all("div",class_="js-tweet-text-container")
         try:
             link=link[0]
-            v=link.find_all("p")
-            paragraphs.append(v[0].text)
+            text=link.find_all("p")
+            paragraphs.append(text[0].text)
         except:
             continue
+#getting the text of the tweets	
 comments=[]
 for i in tags:
-    a=i.find_all("div",class_="content")
-    for j in a:
+    comment=i.find_all("div",class_="content")
+    for j in comment:
         link=j.find_all("button",class_="ProfileTweet-actionButton js-actionButton js-actionReply")
         link=link[0]
         for k in link:
             try:
-                v=k.find_all("span",class_="ProfileTweet-actionCountForPresentation")
-                if v !=None:
-                    v=v[0]
-                    comments.append(v.text)
+                no_comments=k.find_all("span",class_="ProfileTweet-actionCountForPresentation")
+                if no_comments !=None:
+                    no_comments=no_comments[0]
+                    comments.append(no_comments.text)
             except:
                 continue
+#getting no of comments 		
 test_df=pd.DataFrame({'date':date,'names':names,'paragraph':paragraphs,'no. of comments':comments})
+#storing the data in pandas
 test_df.to_csv('data.csv')
+#storing the data in csv file
